@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Experiment</title>
+  <script src="jspsych-6/jspsych.js"></script>
+  <script src="jspsych-6/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="jspsych-6/plugins/jspsych-image-keyboard-response.js"></script>
+  <script src="jspsych-6/plugins/jspsych-video-keyboard-response.js"></script>
+  <script src="jspsych-6/plugins/jspsych-html-slider-response.js"></script>
+  <script src="jspsych-6/plugins/jspsych-fullscreen.js"></script>
+  <link href="jspsych-6/css/jspsych.css" rel="stylesheet" type="text/css">
+  <script src="Snap.svg-0.5.1/dist/snap.svg-min.js"></script>
+
+  <!-- general scripts -->
+  <script src="core.js"></script>
+  <script src="Resources/jquery-3.6.0.min.js"></script>
+
+  <!-- custom scripts -->
+  <script src="jspsych-6/plugins/jo-video-prompt-response-crt-seq.js"></script>
+  <script src="jspsych-6/plugins/jo-html-keyboard-response.js"></script>
+  <script src="jspsych-6/plugins/jd-text-scroll.js"></script>
+  <script src="jspsych-6/plugins/jd-free-sort.js"></script>
+  <script src="jspsych-6/plugins/jd-cloze.js"></script>
+  <script src="jspsych-6/plugins/jd-multiple-choice.js"></script>
+  <script src="jspsych-6/plugins/jd-slider-response.js"></script>
+  <script src="jspsych-6/plugins/jd-survey-html-form.js"></script>
+
+  <script src="Texts/text1.js"></script>
+  <script src="Texts/text1nh.js"></script>
+  <script src="Texts/text1cloze.js"></script>
+</head>
+
+<body>
+<script>
+
+/******** WHAT EXPERIMENT MODE ********/
+    //let shortVersion = true;
+    let debugMode = false;
+    let show_instructions = true;
+    let limitToDesktop = true;
+    let limitToGoogle = true;
+    let forceFullscreen = true;
+    let timeline = [];
+
+    let options = ["heading", "no_heading"];
+    let random_select = Math.floor(Math.random() * options.length);
+    let expt_condition = options[random_select];
+
+/******** GENERAL DIV POINTERS ********/
+
+    /**
+     *  To put things to the center -- style='width: 100%; margin: 0 auto;'
+     *  To overlap the div -- style='position: absolute; margin: 0 auto;'
+     *  To fix the location of the div -- style='position: absolute; margin: 0 auto; top: 10%; left: 10%'
+     */
+
+/******** EXPERIMENT INSTRUCTIONS ********/
+    let instructions_1 = {
+        type: 'jo-html-keyboard-response',
+        wait_duration: 1000,
+        choices: ['space'],
+            stimulus: '<p>In this experiment, you will read an article about a randomly assigned topic.  '
+                      + '<p>The article will appear on the next page. You can scroll through the page using your mouse or trackpad.  '
+                      + 'We want you to read it at a <b>natural pace</b>, as you would any other online article that you chose to read '
+                      + '-- not just <i>skimming</i> it (e.g. as you might if you were not sure that you wanted to read it in the first place), '
+                      + 'but also not <i>studying</i> it (e.g. as you might if you had to take a test on it in school).  '
+                      + 'We really just want you to read it at your own comfortable pace.  '
+                      + 'At the end of the experiment, we will ask you several questions about the information in the article.  '
+                      + '<p>While you are reading, you may encounter occasional typos (e.g. misspelled words).  Whenever you notice a typo, please click on the word.  '
+                      + '<p>For example, try clicking on: <p><span id = "typo">tihs</span></p>'
+                      + '<p>Note that all words turn purple when clicked, not just typos, so please do not click indiscriminately!  '
+                      + 'You should <b>not</b> actively hunt for typos (as you might if you were asked to <i>proofread</i> the article).  '
+                      + 'We just want you to click on the typos that you happen to notice while you are reading naturally.  '
+                      + 'In other words, <b>please read the article with an emphasis on understanding its content</b>.  '
+                      + '<p>The article will take around 5 minutes to read, after which you can press "Continue" to proceed to the next section.  '
+                      + '(We will remind you about that, so that you do not have to remember which key to press.)  '
+                      + 'Note that you will not be able to proceed until 5 minutes have elapsed. Please use this time to read the article in its entirety!',
+        prompt: "Press SPACE to begin.",
+        check_typo: true,
+        data: {
+          subj_id: subj_name,
+          test_part: 'instruct_prompt'
+        }
+    };
+
+    let instructions_2 = {
+        type: 'jo-html-keyboard-response',
+        wait_duration: 3000,
+        choices: ['space'],
+        stimulus: "<p>In the next section, you will be presented with the same text you just read, but with some phrases removed.  " +
+                  "<p>Your task is to fill in the blank sections of the text, reproducing the exact missing text to the best of your ability. " +
+                  "If you're unable to recall the missing text, please just give your best guess.  If you cannot come up with a guess, you can enter 'skip' and go on to the next text box.  " +
+                  "You will not be able to proceed to the next section until you have filled in each text box." +
+                  "<p>When you are satisfied with your answers, please press 'Continue' at the bottom of the page.",
+        prompt: "Press SPACE to continue.",
+        check_typo: false,
+        data: {
+          subj_id: subj_name,
+          test_part: 'instruct_prompt2'
+        }
+    };
+
+    let instructions_3 = {
+        type: 'jo-html-keyboard-response',
+        wait_duration: 3000,
+        choices: ['space'],
+          stimulus: "<p>In the next section, you will be asked a series of questions which all require the use of a 'slider.'  " +
+                    "<p>To use the slider, move the white disc on the line to a location that reflects your response to the question.  " +
+                    "<p>For example, you might be asked how well you paid attention to the article while reading.  " +
+                    "If you were completely focused on the article, you should move the disc to the very right end of the slider.<br>" +
+                    "<img src='images/sample_sliders/slider100.png'></img>" +
+                    "<p>If you were completely distracted, you should put the disc at the very left end of the slider).<br>" +
+                    "<img src='images/sample_sliders/slider0.png'></img>" +
+                    "<p>If you were somewhat focused, but not entirely, you should put the disc somewhere in between depending on how focused you were.<br>" +
+                    "<img src='images/sample_sliders/slider50.png'></img>" +
+                    "<p>When you're confident in your answer, press the continue button.",
+        prompt: "Press SPACE to continue.",
+        check_typo: false,
+        data: {
+          subj_id: subj_name,
+          test_part: 'instruct_prompt3'
+        }
+    };
+
+/******** DEFINE STIMULI ********/
+
+    console.log(expt_condition);
+
+    let text;
+    if (expt_condition === "heading") {
+      text = text1;
+    } else {
+      text = text1nh;
+    }
+
+    let test_trial = {
+        type: 'jd-text-scroll',
+        stimulus: text,
+        wait_time: 1000,
+        data: {subj_id: subj_name, test_part: 'test_trial', expt_condition: expt_condition}
+    };
+
+    let cloze = text1cloze;
+
+    let cloze_trial = {
+        type: 'jd-cloze',
+        text: cloze,
+        button_text: "Continue",
+        check_answers: true,
+        data: {subj_id: subj_name, expt_condition: expt_condition, test_part: 'cloze'}
+    };
+
+    let graph_trial = {
+      type: 'jd-free-sort',
+      stimuli: ["test1", "test2", "test3", "test4"],
+      stim_height: 50,
+      stim_width: 100,
+      prompt: "Arrange the following into a structure that best matches the text",
+    }
+
+    let detail_questions = {
+        type: 'survey-multi-choice',
+        questions: [
+          {name: 'q1', prompt: "Which of the following details was mentioned in the article?",
+            options: [" 'Over time, some plant species adapt to climate change by migrating north to cooler climates.'",
+                      " 'Over time, some plant species adapt to climate change by growing thicker bark.'"],
+            required: true},
+          {name: 'q2', prompt: "Which of the following details was mentioned in the article?",
+            options: [" 'Over the last 50 years, populations of almost all categories of animal have declined by more than 50 percent.'",
+                      " 'Over the last 50 years, populations of seed-carrying birds and mammals have declined by almost 50 percent.'"],
+            required: true},
+          {name: 'q3', prompt: "Which of the following details was mentioned in the article?",
+            options: [" 'In certain regions like North America, most of the seed-carrying is done by prevalent species like squirrels that are not in any danger of extinction.'",
+                      " 'In certain regions like North America, most of the seed-carrying is done by vulnerable and endangered species of birds and mammals.'"],
+            required: true},
+          {name: 'q4', prompt: "Which of the following details was mentioned in the article?",
+            options: [" 'Some fish species like the Atlantic mackerel have migrated up to 200km to adapt to changing temperatures.'",
+                      " 'Some bird species like the European starling have migrated up to 200km to adapt to changing temperatures.'"],
+            required: true},
+          {name: 'q5', prompt: "Which of the following details was mentioned in the article?",
+            options: [" 'The ecologies of North America and Europe have been hit particularly hard by climate change due to the loss of large seed-carrying mammals like elk.'",
+                      " 'The ecologies of North America and Europe have been hit particularly hard by climate change due to the rapid loss of habitable territory through deforestation.'"],
+            required: true},
+          {name: 'q6', prompt: "Which of the following details was mentioned in the article?",
+            options: [" 'Recreational hunting and fishing disproportionately affect forests, due to the decline of primarily forest-dwelling bird and mammal species.'",
+                      " 'Poaching disproportionately affects larger plants and trees, due to the loss of the large mammals that would otherwise transport their larger seeds.'"],
+            required: true},
+          {name: 'q7', prompt: "Which of the following details was mentioned in the article?",
+            options: [" 'In some countries, like Guam, the disappearance of native seed-carrying bird species has made it harder for forests to regenerate.'",
+                      " 'In some countries, like Guam, selective deforestation has created gaps in the forest endangering certain native bird species.'"],
+            required: true}
+        ],
+        preamble: "Please answer the following questions regarding the article you just read.",
+        data: {subj_id: subj_name, expt_condition: expt_condition, test_part: jsPsych.timelineVariable('test_part')}
+    };
+
+    let slider_width = screen.width / 3;
+
+    let attention_question = {
+        type: 'html-slider-response',
+        labels: ['Not Carefully at All', 'Very Carefully'],
+        stimulus: 'While reading the article, how carefully did you pay attention?',
+        button_label: "Continue",
+        require_movement: true,
+        slider_width: slider_width,
+        response_ends_trial: true,
+        data: {subj_id: subj_name, expt_condition: expt_condition, test_part: 'attention_question'}
+    };
+
+    let slider_questions = {
+        timeline: [
+          {
+            type: 'jd-html-slider-response',
+            labels: jsPsych.timelineVariable('labels'),
+            stimulus: jsPsych.timelineVariable('stimulus'),
+            button_label: "Continue",
+            additional_prompt: jsPsych.timelineVariable('additional_prompt'),
+            require_movement: true,
+            slider_width: slider_width,
+            response_ends_trial: true,
+            data: {subj_id: subj_name, expt_condition: expt_condition, test_part: jsPsych.timelineVariable('test_part')}
+          }
+        ],
+        timeline_variables: [
+          {stimulus: "How well do you feel you understood the key points of the article?",
+            labels: ['Did Not Understand At All', 'Completely Understood'],
+            additional_prompt: null,
+            test_part: 'slider q1'},
+          {stimulus: "Sometimes, informative articles of this kind are engaging and fun to read; others are boring and tedious.  How enjoyable did you find this article?",
+            labels: ['Not Enjoyable At All', 'Extremely Enjoyable'],
+            additional_prompt: null,
+            test_part: 'slider q2'},
+          {stimulus: "How interesting did you find the topic of this article after the first few paragraphs?",
+            labels: ['Not Interesting At All', 'Extremely Interesting'],
+            additional_prompt: null,
+            test_part: 'slider q3'},
+          {stimulus: "To what extent did you gain or lose interest in this article over time?",
+            labels: ['Completely Lost Interest', 'Became Much More Interested'],
+            additional_prompt: null,
+            test_part: 'slider q4'},
+          {stimulus: "Using the slider below, indicate which section of the article you found <b>most</b> interesting and enjoyable.",
+            labels: ['The Very Beginning', 'The Very End'],
+            additional_prompt: "No particular section was the most enjoyable.",
+            test_part: 'slider q5'},
+          {stimulus: "To what extent did you gain or lose interest in this article over time?",
+            labels: ['The Very Beginning', 'The Very End'],
+            additional_prompt: "No particular section was the least enjoyable.",
+            test_part: 'slider q6'}
+        ]
+    };
+
+/******** SETUP TIMELINE ********/
+    if (!debugMode) {
+      if (forceFullscreen) {
+        timeline.push({
+          type: 'fullscreen',
+          fullscreen_mode: true,
+          button_label: 'Enter Fullscreen',
+          message: "<p>This experiment will automatically switch into full-screen mode when you press the button below.  "
+                   + "Once you are in full-screen mode, it is important that you do not exit it (e.g. to switch to other windows or tabs).</p>"
+                   + "<p>(Don't worry: we'll bring you back out of full-screen mode as soon as the experiment is over.)</p> "
+                   + "<p>If you do you exit full-screen mode at any point during the experiment, <span style='color:red'><b>it will automatically end "
+                   + "and we will not be able to compensate you</b></span>, so please only accept this study if you are able to stay "
+                   + "in full-screen mode for the full duration (of approximately " + consent_duration + " min).<br><br><br><br>",
+          on_finish: function (data) {
+            let viewport_width = get_viewport_size().width;
+            let viewport_height = get_viewport_size().height;
+            data.screen_width = viewport_width;
+            data.screen_height = viewport_height;
+            console.log("ID", subj_name, "W", viewport_width, "H", viewport_height)
+          }
+        });
+      }
+
+      //timeline.push(check_open_ended_response);
+      //timeline.push(text_intro);
+      //timeline.push(setup_intro);
+      //timeline.push(code_intro);
+
+      timeline.push(consent);
+    }
+
+/******** TRIAL SEQUENCE ********/
+    if (show_instructions) {
+      //timeline.push(instructions_1);
+    }
+    //timeline.push(test_trial);
+    //timeline.push(detail_questions);
+    timeline.push(graph_trial);
+    timeline.push(instructions_2);
+    timeline.push(cloze_trial);
+    timeline.push(instructions_3);
+    timeline.push(attention_question);
+    timeline.push(slider_questions);
+
+/******** DEBRIEF SECTION ********/
+    if (forceFullscreen) {
+      timeline.push({
+        type: 'fullscreen',
+        fullscreen_mode: false,
+        button_label: 'Exit Fullscreen',
+        message: '<p>You can now exit full screen mode.</p>',
+        on_finish: function(data) {
+          let viewport_width = get_viewport_size().width;
+          let viewport_height = get_viewport_size().height;
+          data.screen_width = viewport_width;
+          data.screen_height = viewport_height;
+          console.log("ID", subj_name, "W", viewport_width, "H", viewport_height)
+        }
+      });
+    }
+
+    timeline.push(check_debrief_response);
+    timeline.push(expt_end);
+    timeline.push(code_end);
+    timeline.push(close_end);
+    console.log(timeline);
+
+/******** RUN TRIAL ********/
+    function saveData(name, data) {
+      let xhr = new XMLHttpRequest();
+      xhr.open('POST', 'write_data.php');
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify({
+        filename: name,
+        filedata: data
+      }));
+    }
+
+    if (limitToGoogle) {
+      let browserInfo = getBrowserInfo();
+      if (browserInfo.browser !== 'Chrome') {
+        Message = "This experiment is only supported by Google Chrome. Please reopen the experiment in Google Chrome."
+        let wrong_browser = {
+          type: 'html-keyboard-response',
+          stimulus: ['<p style="font-size: 26px;">' + Message + '</p>'],
+          choices: jsPsych.NO_KEYS,
+        };
+        jsPsych.init({
+          timeline: [wrong_browser]
+        });
+      } else {
+        if (limitToDesktop) {
+          let mobileCheck = mobileAndTabletCheck();
+          if (mobileCheck) {
+            Message =
+              "This experiment is only supported by desktop browsers, and cannot be run on a tablet or a phone. Please reopen the experiment in a desktop browser.  If you can only use a tablet or a phone, and are unable to switch to a desktop browser, please quit the experiment and return the HIT."
+            let wrong_browser = {
+              type: 'html-keyboard-response',
+              stimulus: ['<p style="font-size: 26px;">' + Message + '</p>'],
+              choices: jsPsych.NO_KEYS,
+            };
+            jsPsych.init({
+              timeline: [wrong_browser]
+            });
+          } else if (
+            /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i
+            .test(navigator.userAgent) ||
+            /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i
+            .test(navigator.userAgent.substr(0, 4))) {
+            Message =
+              "This experiment is only supported by desktop browsers, and cannot be run on a tablet or a phone. Please reopen the experiment in a desktop browser.  If you can only use a tablet or a phone, and are unable to switch to a desktop browser, please quit the experiment and return the HIT."
+            let wrong_browser = {
+              type: 'html-keyboard-response',
+              stimulus: ['<p style="font-size: 26px;">' + Message + '</p>'],
+              choices: jsPsych.NO_KEYS,
+            };
+            jsPsych.init({
+              timeline: [wrong_browser]
+            });
+          } else {
+            let mobile_prompt = {
+              type: 'html-keyboard-response',
+              choices: ['space'],
+              stimulus: '<p>This experiment requires you to be using a desktop browser. The program should have automatically detected whether you are using a phone or a tablet.<p><strong>If you are using a phone or tablet and it has still allowed you to continue, please reopen the experiment in a desktop browser now.</strong><p>If you can only use a tablet or a phone, and are unable to switch to a desktop browser, please quit the experiment and return the HIT.</p><p>If you are on a desktop browser -- great!  Press the spacebar to continue.</p>'
+            };
+            startExpt();
+          }
+        } else {
+          startExpt();
+        }
+      }
+    } else {
+      if (limitToDesktop) {
+          let mobileCheck = mobileAndTabletCheck();
+          if (mobileCheck) {
+            Message =
+              "This experiment is only supported by desktop browsers, and cannot be run on a tablet or a phone. Please reopen the experiment in a desktop browser.  If you can only use a tablet or a phone, and are unable to switch to a desktop browser, please quit the experiment and return the HIT."
+            wrong_browser = {
+              type: 'html-keyboard-response',
+              stimulus: ['<p style="font-size: 26px;">' + Message + '</p>'],
+              choices: jsPsych.NO_KEYS,
+            };
+            jsPsych.init({
+              timeline: [wrong_browser]
+            });
+          } else if (
+            /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i
+            .test(navigator.userAgent) ||
+            /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i
+            .test(navigator.userAgent.substr(0, 4))) {
+            Message =
+              "This experiment is only supported by desktop browsers, and cannot be run on a tablet or a phone. Please reopen the experiment in a desktop browser.  If you can only use a tablet or a phone, and are unable to switch to a desktop browser, please quit the experiment and return the HIT."
+            wrong_browser = {
+              type: 'html-keyboard-response',
+              stimulus: ['<p style="font-size: 26px;">' + Message + '</p>'],
+              choices: jsPsych.NO_KEYS,
+            };
+            jsPsych.init({
+              timeline: [wrong_browser]
+            });
+          } else {
+            let mobile_prompt = {
+              type: 'html-keyboard-response',
+              choices: ['space'],
+              stimulus: '<p>This experiment requires you to be using a desktop browser. '
+                        + 'The program should have automatically detected whether you are using a phone or a tablet.'
+                        + '<p><strong>If you are using a phone or tablet, and it has still allowed you to continue, please reopen the experiment in a desktop browser now.'
+                        + '</strong><p>If you can only use a tablet or a phone, and are unable to switch to a desktop browser, please quit the experiment and return the HIT.'
+                        + '</p><p>If you are on a desktop browser -- great!  Press the space bar to continue.</p>'
+            };
+            startExpt();
+          }
+        } else {
+          startExpt();
+        }
+    }
+
+  </script>
+</body>
+
+</html>
